@@ -22,7 +22,7 @@ public class Role {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private int id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
