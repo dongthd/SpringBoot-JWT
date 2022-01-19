@@ -42,13 +42,11 @@ public class User {
 	private String token;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_role",
-	joinColumns = @JoinColumn(name = "user_id"),
-	inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
 	public User(String username, String email, String encode, String phone, String address, Boolean gender,
-			Boolean status, String avatar, LocalDate registerDate) {
+			Boolean status, String avatar, LocalDate registerDate, String token) {
 		this.username = username;
 		this.email = email;
 		this.phone = phone;
@@ -58,6 +56,7 @@ public class User {
 		this.avatar = avatar;
 		this.registerDate = registerDate;
 		this.password = encode;
+		this.token = token;
 
 	}
 }

@@ -30,8 +30,8 @@ import vn.security.userprincal.UserPrinciple;
 import vn.service.impl.RoleServiceImpl;
 import vn.service.impl.UserServiceImpl;
 
-@RequestMapping("/api/auth")
 @RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
 	@Autowired
@@ -48,7 +48,8 @@ public class AuthController {
 
 	@Autowired
 	JwtProvider jwtProvider;
-
+	
+	//sign up
 	@PostMapping("/signup")
 	public ResponseEntity<?> register(@Valid @RequestBody SignUpForm signUpForm) {
 
@@ -60,10 +61,19 @@ public class AuthController {
 			return new ResponseEntity<>(new ResponseMessage("The email existed! Please try again!"), HttpStatus.OK);
 		}
 
-		// create new user
-		User user = new User(signUpForm.getUsername(), signUpForm.getEmail(),
-				passwordEncoder.encode(signUpForm.getPassword()), signUpForm.getPhone(), signUpForm.getAddress(),
-				signUpForm.getGender(), signUpForm.getStatus(), signUpForm.getAvatar(), signUpForm.getRegisterDate());
+		// create user
+		User user = new User(
+				signUpForm.getUsername(),
+				signUpForm.getEmail(),
+				passwordEncoder.encode(signUpForm.getPassword()),
+				signUpForm.getPhone(),
+				signUpForm.getAddress(),
+				signUpForm.getGender(),
+				signUpForm.getStatus(),
+				signUpForm.getAvatar(),
+				signUpForm.getRegisterDate(),
+				jwtProvider.doGenerateToken(signUpForm.getEmail())
+				);
 
 		Set<Role> roles = new HashSet<>();
 		Role userRole = roleService.findByName(RoleName.ROLE_USER)
@@ -76,6 +86,7 @@ public class AuthController {
 
 	}
 
+	//sign in
 	@PostMapping("/signin")
 	public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm) {
 
@@ -85,10 +96,20 @@ public class AuthController {
 		String token = jwtProvider.createToken(authentication);
 		UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 
-		return ResponseEntity.ok(new JwtResponse(token, userPrincipal.getId(), userPrincipal.getUsername(),
-				userPrincipal.getEmail(), userPrincipal.getPassword(), userPrincipal.getPhone(),
-				userPrincipal.getAddress(), userPrincipal.getGender(), userPrincipal.getStatus(),
-				userPrincipal.getAvatar(), userPrincipal.getRegisterDate(), userPrincipal.getAuthorities()));
+		return ResponseEntity.ok(
+				new JwtResponse(token,
+				userPrincipal.getId(),
+				userPrincipal.getUsername(),
+				userPrincipal.getEmail(),
+				userPrincipal.getPassword(),
+				userPrincipal.getPhone(),
+				userPrincipal.getAddress(),
+				userPrincipal.getGender(),
+				userPrincipal.getStatus(),
+				userPrincipal.getAvatar(),
+				userPrincipal.getRegisterDate(),
+				userPrincipal.getAuthorities())
+				);
 	}
 
 }

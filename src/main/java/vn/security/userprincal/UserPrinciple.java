@@ -113,9 +113,4 @@ public class UserPrinciple implements UserDetails {
 
 	}
 
-//	@Override
-//	public String getUsername() {
-//		return getEmail();
-//	}
-
 }

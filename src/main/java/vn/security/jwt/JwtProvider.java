@@ -1,13 +1,16 @@
 package vn.security.jwt;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -30,13 +33,27 @@ public class JwtProvider {
 	public String createToken(Authentication authentication) {
 		
 		UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-		return Jwts.builder().setSubject(userPrinciple.getUsername())
+		return Jwts.builder()
+				.setSubject(userPrinciple.getUsername())
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 
 	}
+	
+	public String doGenerateToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("scopes", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuer("dev")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 5*60*60*1000))
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .compact();
+    }
 	
 	public boolean validateJwtToken(String token) {
 		try {
